@@ -14,6 +14,11 @@ POSTS = [
 def get_posts():
     return jsonify(POSTS)
 
+#list of all posts
+@app.get('/api/posts')
+def list_posts():
+    return jsonify(POSTS), 200
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5002, debug=True)
