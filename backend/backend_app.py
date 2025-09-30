@@ -1,9 +1,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import request
+from flask import request
 
 app = Flask(__name__)
-CORS(app)  # This will enable CORS for all routes
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 POSTS = [
     {"id": 1, "title": "First post", "content": "This is the first post."},
@@ -20,10 +20,12 @@ def next_id():
             max_id = post_id
     return max_id + 1
 
-
-@app.route('/api/posts', methods=['GET'])                          # noch benötigt?
-def get_posts():
-    return jsonify(POSTS)
+#ID is the place to be - search function
+def find_index(pid: int):
+    for i, p in enumerate(POSTS):
+        if p["id"] == pid:
+            return i
+    return None
 
 
 #list of all posts
@@ -45,6 +47,15 @@ def add_post():
         if not value or not str(value).strip():
             missing.append(field)
 
+#delete function via ID
+@app.delete('/api/posts/<int:pid>')
+def delete_post(post_id:int):
+    idx = find_index(post_id)
+    if idx is None:
+        return jsonify({"error": f"Post with id {post_id} not found."}), 404
+    POSTS.pop(idx)
+    return jsonify({"message": f"Post with id {post_id} has been deleted successfully."}), 200
+
 #calling the new ID here within post
     if missing:
         return jsonify({"error": "Missing required field(s): " + ", ".join(missing)}), 400
@@ -57,4 +68,4 @@ def add_post():
     return jsonify(post), 201
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True)
