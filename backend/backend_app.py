@@ -47,6 +47,29 @@ def add_post():
         if not value or not str(value).strip():
             missing.append(field)
 
+
+#using the ID to update the post (Content or Title)
+@app.put("/api/posts/<int:pid>")
+def update_post(pid: int):
+    idx = find_index(pid)
+    if idx is None:
+        return jsonify({"error": f"Post with id {pid} not found."}), 404
+
+    data = request.get_json(silent=True) or {}
+
+    if "title" in data and isinstance(data["title"], str):
+        new_title = data["title"].strip()
+        if new_title:
+            POSTS[idx]["title"] = new_title
+
+    if "content" in data and isinstance(data["content"], str):
+        new_content = data["content"].strip()
+        if new_content:
+            POSTS[idx]["content"] = new_content
+
+    return jsonify(POSTS[idx]), 200
+
+
 #delete function via ID
 @app.delete('/api/posts/<int:pid>')
 def delete_post(post_id:int):
@@ -55,6 +78,7 @@ def delete_post(post_id:int):
         return jsonify({"error": f"Post with id {post_id} not found."}), 404
     POSTS.pop(idx)
     return jsonify({"message": f"Post with id {post_id} has been deleted successfully."}), 200
+
 
 #calling the new ID here within post
     if missing:
@@ -66,6 +90,21 @@ def delete_post(post_id:int):
     }
     POSTS.append(post)
     return jsonify(post), 201
+
+#search function
+@app.get("/api/posts/search")
+def search_posts():
+    q_title = (request.args.get("title") or "").lower()
+    q_content = (request.args.get("content") or "").lower()
+
+    def matches(p):
+        title_ok = (q_title in p["title"].lower()) if q_title else True
+        content_ok = (q_content in p["content"].lower()) if q_content else True
+        return title_ok and content_ok
+
+    results = [p for p in POSTS if matches(p)]
+    return jsonify(results), 200
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5002, debug=True)
