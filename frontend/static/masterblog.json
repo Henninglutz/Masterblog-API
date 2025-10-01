@@ -1,0 +1,25 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Masterblog API",
+    "version": "1.0.0"
+  },
+  "host": "localhost:5002",
+  "basePath": "/",
+  "schemes": ["http"],
+  "tags": [
+    { "name": "Post", "description": "Post API - CRUD" }
+  ],
+  "paths": {
+    "/api/posts": {
+      "get": {
+        "summary": "Returns all posts",
+        "produces": ["application/json"],
+        "tags": ["Post"],
+        "responses": {
+          "200": { "description": "Successful operation" }
+        }
+      }
+    }
+  }
+}
