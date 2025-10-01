@@ -4,21 +4,21 @@ from flask_cors import CORS
 from flask import request
 from flask_swagger_ui import get_swaggerui_blueprint
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-SWAGGER_URL="/api/docs"  # (1) swagger endpoint e.g. HTTP://localhost:5002/api/docs
-API_URL="/static/masterblog.json" # (2) ensure you create this dir and file
+#new endpoint for docs
+SWAGGER_URL="/api/docs"
+API_URL="/static/masterblog.json"
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': 'Masterblog API' # (3) You can change this if you like
+        'app_name': 'Masterblog API'
     }
 )
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
-
 
 POSTS = [
     {"id": 1, "title": "First post", "content": "This is the first post."},
